@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aadhaar Verification - DigiLocker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+        }
+        .header {
+            background: #1a237e;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .user-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid #1a237e;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+        .btn-primary {
+            background: #1a237e;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #303f9f;
+        }
+        .btn-success {
+            background: #4caf50;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #45a049;
+        }
+        .otp-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 8px;
+            margin: 15px 0;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1a237e;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 15px;
+        }
+		@keyframes spin {
+		            0% { transform: rotate(0deg); }
+		            100% { transform: rotate(360deg); }
+		        }
+		        .success-message {
+		            background: #d4edda;
+		            color: #155724;
+		            padding: 20px;
+		            border-radius: 8px;
+		            text-align: center;
+		            margin-bottom: 20px;
+		            border: 1px solid #c3e6cb;
+		        }
+		        .section {
+		            display: none;
+		        }
+		        .section.active {
+		            display: block;
+		        }
+		    </style>
+		</head>
+		<body>
+		    <div class="container">
+		        <div class="header">
+		            <h1>Aadhaar Verification</h1>
+		            <p>Step 2: Verify your Aadhaar to access DigiLocker</p>
+		        </div>
+		 
+		        <div class="content">
+		            <!-- User Information -->
+		            <div class="user-info">
+		                <h3>User Information</h3>
+		                <div class="info-row">
+		                    <span><strong>Name:</strong></span>
+		                    <span id="userName">Loading...</span>
+		                </div>
+		                <div class="info-row">
+		                    <span><strong>Aadhaar:</strong></span>
+		                    <span id="userAadhaar">Loading...</span>
+		                </div>
+		                <div class="info-row">
+		                    <span><strong>Candidate ID:</strong></span>
+		                    <span id="userCandidateId">Loading...</span>
+		                </div>
+		            </div>
+		 
+		            <!-- Step 1: Send OTP -->
+		            <div id="sendOtpSection" class="section active">
+		                <p>We need to verify your Aadhaar before accessing DigiLocker.</p>
+		                <button class="btn btn-primary" onclick="sendOtp()">
+		                    Send OTP to Registered Mobile
+		                </button>
+		            </div>
+		 
+		            <!-- Step 2: Verify OTP -->
+		            <div id="verifyOtpSection" class="section">
+		                <p>Enter the OTP sent to your Aadhaar registered mobile number:</p>
+						<input type="text"
+						         class="otp-input"
+						         id="otp"
+						         name="otp"
+						         placeholder="Enter 6-digit OTP"
+						         maxlength="6"
+						         pattern="[0-9]{6}"
+						         required
+						         oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+						         style="font-size: 18px; font-weight: bold; color: #333;">
+		                <button class="btn btn-success" onclick="verifyOtp()">
+		                    Verify OTP & Proceed to DigiLocker
+		                </button>
+		            </div>
+		 
+		            <!-- Step 3: Aadhaar Verified Success -->
+		            <div id="aadhaarVerifiedSection" class="section">
+		                <div class="success-message">
+		                    <h3>✓ Aadhaar Verified Successfully!</h3>
+		                    <p>Your Aadhaar number has been verified successfully.</p>
+		                </div>
+		                <p>You will be redirected to DigiLocker shortly...</p>
+		            </div>
+		 
+		            <div class="loading" id="loadingSection">
+		                <div class="spinner"></div>
+		                <p id="loadingText">Processing...</p>
+		            </div>
+		        </div>
+		    </div>
+			<script>
+			    const urlParams = new URLSearchParams(window.location.search);
+			    
+			    // Use URL parameters if available, otherwise use hardcoded values
+			    const candidateId = urlParams.get('candidateId') || '1';
+			    const candidateName = urlParams.get('candidateName') || 'Meharunnisa';
+			    const aadhaarNumber = urlParams.get('aadhaarNumber') ? urlParams.get('aadhaarNumber').replace(/\D/g, '') : '987654321099';
+			    
+			    let txnId = null;
+			    let digiLockerUrl = null;
+		 
+			    // Debug what we received
+			    console.log("=== URL PARAMETERS DEBUG ===");
+			    console.log("candidateId:", candidateId);
+			    console.log("candidateName:", candidateName);
+			    console.log("aadhaarNumber:", aadhaarNumber);
+			    console.log("Full URL:", window.location.href);
+			    console.log("All URL params:", Object.fromEntries(urlParams.entries()));
+			    console.log("============================");
+		 
+			    // IMMEDIATELY set user information
+			    document.getElementById('userName').textContent = candidateName;
+			    document.getElementById('userAadhaar').textContent = aadhaarNumber ? `XXXX-XXXX-${aadhaarNumber.slice(-4)}` : 'Not provided';
+			    document.getElementById('userCandidateId').textContent = candidateId;
+		 
+			    function showSection(sectionId) {
+			        document.querySelectorAll('.section').forEach(section => {
+			            section.classList.remove('active');
+			        });
+			        document.getElementById(sectionId).classList.add('active');
+			    }
+		 
+			    async function sendOtp() {
+			        const loadingSection = document.getElementById('loadingSection');
+			        const loadingText = document.getElementById('loadingText');
+			        
+			        // Check if we have a valid Aadhaar number
+			        if (!aadhaarNumber || aadhaarNumber.length !== 12) {
+			            alert('Error: Aadhaar number is missing or invalid. Received: ' + aadhaarNumber);
+			            return;
+			        }
+		 
+			        loadingText.textContent = 'Sending OTP to your registered mobile...';
+			        loadingSection.style.display = 'block';
+		 
+			        try {
+			            console.log("Sending OTP for Aadhaar:", aadhaarNumber);
+			            
+			            const response = await fetch(`http://localhost:8068/api/digilocker/send-otp/${aadhaarNumber}`, {
+			                method: 'POST',
+			                headers: {
+			                    'Content-Type': 'application/json',
+			                }
+			            });
+		 
+			            const data = await response.json();
+			            
+			            if (response.ok) {
+			                txnId = data.txnId || 'mock-txn-id-12345';
+			                
+			                // Show OTP input section
+			                showSection('verifyOtpSection');
+			                loadingSection.style.display = 'none';
+			                
+			                alert('OTP sent successfully to your registered mobile number!');
+			            } else {
+			                throw new Error(data.message || data.error || 'Failed to send OTP');
+			            }
+			        } catch (error) {
+			            loadingSection.style.display = 'none';
+			            alert('Error: ' + error.message);
+			            console.error('OTP Send Error:', error);
+			        }
+			    }
+		 
+			    async function verifyOtp() {
+			        const otp = document.getElementById('otp').value;
+			        const loadingSection = document.getElementById('loadingSection');
+			        const loadingText = document.getElementById('loadingText');
+		 
+			        if (!otp || otp.length !== 6) {
+			            alert('Please enter a valid 6-digit OTP');
+			            return;
+			        }
+		 
+			        loadingText.textContent = 'Verifying OTP...';
+			        loadingSection.style.display = 'block';
+		 
+			        try {
+			            // Verify OTP and get DigiLocker URL
+			            const response = await fetch('http://localhost:8068/api/digilocker/verify-otp', {
+			                method: 'POST',
+			                headers: {
+			                    'Content-Type': 'application/x-www-form-urlencoded',
+			                },
+			                body: `txnId=${txnId}&otp=${otp}&candidateId=${candidateId}`
+			            });
+		 
+			            const data = await response.json();
+			            
+			            if (response.ok) {
+			                // Store DigiLocker URL
+			                digiLockerUrl = data.redirectToDigiLocker;
+			                
+			                // Show Aadhaar verified success
+			                showSection('aadhaarVerifiedSection');
+			                loadingSection.style.display = 'none';
+		 
+			                // Redirect to DigiLocker after 3 seconds
+			                setTimeout(() => {
+			                    if (digiLockerUrl) {
+			                        window.location.href = digiLockerUrl;
+			                    } else {
+			                        alert('Error: DigiLocker URL not received');
+			                    }
+			                }, 3000);
+			            } else {
+			                throw new Error(data.message || 'OTP verification failed');
+			            }
+			        } catch (error) {
+			            loadingSection.style.display = 'none';
+			            alert('Error: ' + error.message);
+			        }
+			    }
+			</script>
+		</body>
+		</html>
+		 
