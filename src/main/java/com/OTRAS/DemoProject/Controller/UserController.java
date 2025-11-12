@@ -49,6 +49,7 @@ import com.OTRAS.DemoProject.Service.UserService;
  
  
 @RestController
+@CrossOrigin(origins = "*")
 
 @RequestMapping("/api/auth")
 
