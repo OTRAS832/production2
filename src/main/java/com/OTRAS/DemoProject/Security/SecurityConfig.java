@@ -98,28 +98,31 @@ public class SecurityConfig {
             // Disable Spring's internal CORS (handled by SimpleCORSFilter)
             .cors(cors -> cors.disable())
 
-            // Authorization rules
             .authorizeHttpRequests(auth -> auth
-                // ✅ Allow all preflight (OPTIONS) requests for CORS
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                // ✅ Allow authentication-related endpoints
-                .requestMatchers("/api/auth/**").permitAll()
-
-                // ✅ Allow public access to static files or general APIs if needed
-                .requestMatchers(
-                    "/api/public/**",
-                    "/api/test/**",
-                    "/health",
-                    "/actuator/**"
-                ).permitAll()
-
-                // ❌ Restrict sensitive or admin APIs (optional)
-                // .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
-                // ✅ Allow everything else for now (stateless public API)
-                .anyRequest().permitAll()
-            )
+                    .anyRequest().permitAll()
+                )
+            // Authorization rules
+//            .authorizeHttpRequests(auth -> auth
+//                // ✅ Allow all preflight (OPTIONS) requests for CORS
+//                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+//
+//                // ✅ Allow authentication-related endpoints
+//                .requestMatchers("/api/auth/**").permitAll()
+//
+//                // ✅ Allow public access to static files or general APIs if needed
+//                .requestMatchers(
+//                    "/api/public/**",
+//                    "/api/test/**",
+//                    "/health",
+//                    "/actuator/**"
+//                ).permitAll()
+//
+//                // ❌ Restrict sensitive or admin APIs (optional)
+//                // .requestMatchers("/api/admin/**").hasRole("ADMIN")
+//
+//                // ✅ Allow everything else for now (stateless public API)
+//                .anyRequest().permitAll()
+//            )
 
             // Use stateless session since we're using JWT
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
