@@ -24,10 +24,12 @@ import com.OTRAS.DemoProject.Service.UserService;
 @CrossOrigin(
     originPatterns = {
         "http://localhost:*",
-        "https://*.vercel.app"
+        "https://*.vercel.app",
+        "https://otrasuser.vercel.app"
     },
     allowCredentials = "true"
 )
+    
 @RestController
 @RequestMapping("/api/auth")
 public class UserController {
