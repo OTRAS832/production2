@@ -14,15 +14,19 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins(
-                                "http://localhost:5171",
-                                "http://localhost:5172",
-                                "http://localhost:5173",
-                                "http://localhost:5174",
-                                "http://localhost:5175",
-                                "https://otras-admin-h5q6.vercel.app",
-                                "https://otrasuser.vercel.app",
-                                "https://otras-exam.vercel.app"
+                        // .allowedOrigins(
+                        //         "http://localhost:5171",
+                        //         "http://localhost:5172",
+                        //         "http://localhost:5173",
+                        //         "http://localhost:5174",
+                        //         "http://localhost:5175",
+                        //         "https://otras-admin-h5q6.vercel.app",
+                        //         "https://otrasuser.vercel.app",
+                        //         "https://otras-exam.vercel.app"
+                        // )
+                      .allowedOriginPatterns(
+                                "http://localhost:*",
+                                "https://*.vercel.app"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
