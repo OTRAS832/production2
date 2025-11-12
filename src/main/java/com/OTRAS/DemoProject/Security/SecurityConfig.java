@@ -24,11 +24,11 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-                // Allow CORS preflight requests
+                // Allow CORS preflight (OPTIONS)
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // Allow public auth endpoints
                 .requestMatchers("/api/auth/**").permitAll()
-                // Allow all other requests (adjust if you add authentication later)
+                // Allow everything else (adjust later if you add auth)
                 .anyRequest().permitAll()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -40,7 +40,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // ✅ Use patterns to support multiple origins and Cloud Run proxy behavior
+        // ✅ Works for localhost (dev) + all Vercel domains (prod)
         configuration.setAllowedOriginPatterns(Arrays.asList(
             "http://localhost:*",
             "https://*.vercel.app"
