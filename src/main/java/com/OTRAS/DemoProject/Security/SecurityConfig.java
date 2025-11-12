@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod; // <-- Added HttpMethod import
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,8 +25,15 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll() // allow your auth endpoints
-                .anyRequest().permitAll() // allow everything (adjust if needed)
+                // 🚀 CRITICAL FIX: Explicitly allow all OPTIONS pre-flight requests 
+                // This ensures Spring Security does not intercept the CORS handshake.
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
+                
+                // Allow specific auth endpoints
+                .requestMatchers("/api/auth/**").permitAll() 
+                
+                // Allow everything else (if this is for a public API)
+                .anyRequest().permitAll() 
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
@@ -36,7 +44,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // ✅ Include all your frontend URLs (localhost + Vercel)
+        // Allowing all necessary frontend origins (including Vercel and localhost)
         configuration.setAllowedOrigins(Arrays.asList(
             "http://localhost:5171",
             "http://localhost:5172",
@@ -48,10 +56,17 @@ public class SecurityConfig {
             "https://otras-exam.vercel.app"
         ));
 
+        // Ensure OPTIONS is explicitly listed here as well
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        
+        // Allowing all headers
+        configuration.setAllowedHeaders(Arrays.asList("*")); 
+        
+        // Exposing headers
         configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        configuration.setAllowCredentials(true);
+        
+        // Credentials must be true for cookies/auth headers
+        configuration.setAllowCredentials(true); 
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
